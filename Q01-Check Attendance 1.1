@@ -1,0 +1,169 @@
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import javax.swing.*;
+ 
+public class BillCalculatorGUI extends JFrame {
+    private JTextField lastMeterField, currentMeterField, unitAmountField, resultField, totalRentalField;
+    private JProgressBar progressBar;
+    private JComboBox<String> roomTypeComboBox;
+    private JRadioButton waterBillButton, electricBillButton;
+    private JButton calculateButton, resetButton;
+    private ButtonGroup billTypeGroup;
+ 
+    public BillCalculatorGUI() {
+        setTitle("Bill Calculator");
+        setSize(500, 400);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLayout(null);
+ 
+        JLabel selectBillLabel = new JLabel("Select Bills");
+        selectBillLabel.setBounds(20, 20, 100, 20);
+        add(selectBillLabel);
+ 
+        waterBillButton = new JRadioButton("Water Bill");
+        waterBillButton.setBounds(20, 50, 100, 20);
+        electricBillButton = new JRadioButton("Electric Bill");
+        electricBillButton.setBounds(20, 80, 100, 20);
+ 
+        billTypeGroup = new ButtonGroup();
+        billTypeGroup.add(waterBillButton);
+        billTypeGroup.add(electricBillButton);
+ 
+        add(waterBillButton);
+        add(electricBillButton);
+ 
+        JLabel lastMeterLabel = new JLabel("Last Meter");
+        lastMeterLabel.setBounds(150, 20, 100, 20);
+        add(lastMeterLabel);
+ 
+        lastMeterField = new JTextField();
+        lastMeterField.setBounds(150, 50, 100, 20);
+        add(lastMeterField);
+ 
+        JLabel currentMeterLabel = new JLabel("Current Meter");
+        currentMeterLabel.setBounds(150, 80, 100, 20);
+        add(currentMeterLabel);
+ 
+        currentMeterField = new JTextField();
+        currentMeterField.setBounds(150, 110, 100, 20);
+        add(currentMeterField);
+ 
+        JLabel roomTypeLabel = new JLabel("Room Type");
+        roomTypeLabel.setBounds(300, 20, 100, 20);
+        add(roomTypeLabel);
+ 
+        roomTypeComboBox = new JComboBox<>(new String[]{"Single Bed", "Double Bed"});
+        roomTypeComboBox.setBounds(300, 50, 150, 20);
+        add(roomTypeComboBox);
+ 
+        JLabel unitAmountLabel = new JLabel("Unit Amount");
+        unitAmountLabel.setBounds(20, 150, 100, 20);
+        add(unitAmountLabel);
+ 
+        unitAmountField = new JTextField();
+        unitAmountField.setBounds(150, 150, 100, 20);
+        unitAmountField.setEditable(false);
+        add(unitAmountField);
+ 
+        JLabel resultLabel = new JLabel("Result");
+        resultLabel.setBounds(20, 180, 100, 20);
+        add(resultLabel);
+ 
+        resultField = new JTextField();
+        resultField.setBounds(150, 180, 100, 20);
+        resultField.setEditable(false);
+        add(resultField);
+ 
+        JLabel totalRentalLabel = new JLabel("Total Rental");
+        totalRentalLabel.setBounds(300, 150, 100, 20);
+        add(totalRentalLabel);
+ 
+        totalRentalField = new JTextField();
+        totalRentalField.setBounds(400, 150, 100, 20);
+        totalRentalField.setEditable(false);
+        add(totalRentalField);
+ 
+        calculateButton = new JButton("Calculate Bill");
+        calculateButton.setBounds(20, 250, 150, 30);
+        add(calculateButton);
+ 
+        resetButton = new JButton("Reset");
+        resetButton.setBounds(200, 250, 150, 30);
+        add(resetButton);
+ 
+        progressBar = new JProgressBar(0, 100);
+        progressBar.setBounds(20, 300, 460, 20);
+        add(progressBar);
+ 
+        calculateButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    double lastMeter = Double.parseDouble(lastMeterField.getText());
+                    double currentMeter = Double.parseDouble(currentMeterField.getText());
+ 
+                    if (currentMeter <= lastMeter) {
+                        JOptionPane.showMessageDialog(null, "Current Meter must be greater than Last Meter");
+                        return;
+                    }
+ 
+                    double unitAmount = currentMeter - lastMeter;
+                    unitAmountField.setText(String.format("%.2f", unitAmount));
+ 
+                    double billRate;
+                    if (electricBillButton.isSelected()) {
+                        billRate = 6.0;
+                    } else if (waterBillButton.isSelected()) {
+                        billRate = 5.0;
+                    } else {
+                        JOptionPane.showMessageDialog(null, "Please select a bill type");
+                        return;
+                    }
+ 
+                    double billAmount = unitAmount * billRate;
+                    resultField.setText(String.format("%.2f", billAmount));
+ 
+                    String roomType = (String) roomTypeComboBox.getSelectedItem();
+                    double roomRental;
+                    if ("Single Bed".equals(roomType)) {
+                        roomRental = 1500.0;
+                    } else if ("Double Bed".equals(roomType)) {
+                        roomRental = 2000.0;
+                    } else {
+                        JOptionPane.showMessageDialog(null, "Please select a room type");
+                        return;
+                    }
+                    double totalRental = roomRental + billAmount;
+                    totalRentalField.setText(String.format("%.2f", totalRental));
+ 
+                    progressBar.setValue(100);
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(null, "Please enter valid numbers");
+                }
+            }
+        });
+ 
+        resetButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                lastMeterField.setText("");
+                currentMeterField.setText("");
+                unitAmountField.setText("");
+                resultField.setText("");
+                totalRentalField.setText("");
+                progressBar.setValue(0);
+                billTypeGroup.clearSelection();
+                roomTypeComboBox.setSelectedIndex(0);
+            }
+        });
+    }
+ 
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            BillCalculatorGUI gui = new BillCalculatorGUI();
+            gui.setVisible(true);
+        });
+    }
+}
+ 
+ 
